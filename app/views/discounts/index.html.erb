@@ -1,0 +1,6 @@
+<% @merchant.discounts.each do |discount|%>
+<p> Discount Name: <%= discount.name %> </p>
+<p> Percentage Off: <%= discount.percent_discount%> </p>
+<p> Item Limit: <%= discount.quantity_limit %> </p>
+<p> <%= link_to "View #{discount.name} Details", merchant_discount_path(@merchant, discount) %> </p>
+<% end %>
