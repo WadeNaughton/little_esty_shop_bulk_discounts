@@ -5,4 +5,5 @@
 <p> Percentage Off: <%= discount.percent_discount%> </p>
 <p> Item Limit: <%= discount.quantity_limit %> </p>
 <p> <%= link_to "View #{discount.name} Details", merchant_discount_path(@merchant, discount) %> </p>
+<p> <%= link_to "Delete #{discount.name}", "/merchant/#{@merchant.id}/discounts/#{discount.id}", method: :delete %> </p>
 <% end %>
