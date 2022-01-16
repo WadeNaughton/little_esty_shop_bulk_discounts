@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'discounts show page' do
+RSpec.describe 'discounts dashboard' do
   before :each do
     @merchant1 = Merchant.create!(name: 'Hair Care')
 
@@ -46,18 +46,18 @@ RSpec.describe 'discounts show page' do
     @discount4 = @merchant1.discounts.create!(name: 'discount_D', percent_discount: 40, quantity_limit: 4)
     @discount5 = @merchant1.discounts.create!(name: 'discount_E', percent_discount: 50, quantity_limit: 5)
 
-    visit merchant_discount_path(@merchant1, @discount1)
+    visit "/merchant/#{@merchant1.id}/discounts/#{@discount1.id}/edit"
   end
-  it "shows discount attributes" do
-    expect(page).to have_content(@discount1.name)
-    expect(page).to have_content(@discount1.percent_discount)
-    expect(page).to have_content(@discount1.quantity_limit)
-  end
+  it "edits discount" do
 
-  it "links to an edit page" do
-    expect(page).to have_link("Edit #{@discount1.name}")
-    click_link("Edit #{@discount1.name}")
-    expect(current_path).to eq(edit_merchant_discount_path(@merchant1, @discount1))
-
+    expect(page).to have_field(:name, with:'discount_A')
+    expect(page).to have_field(:percent_discount, with: 20)
+    expect(page).to have_field(:quantity_limit, with: 1)
+    fill_in(:name, with: 'NEW DISCOUNT NAME')
+    expect(page).to have_field(:name, with: 'NEW DISCOUNT NAME')
+    click_button "Save"
+    expect(current_path).to eq(merchant_discount_path(@merchant1, @discount1))
+    expect(page).to have_content('NEW DISCOUNT NAME')
+    expect(page).to_not have_content('discount_A')
   end
 end

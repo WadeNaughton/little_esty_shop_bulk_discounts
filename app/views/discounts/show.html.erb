@@ -1,3 +1,4 @@
 <p><%= @discount.name %></p>
 <p>Percentage Discount: <%= @discount.percent_discount %></p>
 <p>Quantity Limit: <%= @discount.quantity_limit%></p>
+<%= link_to "Edit #{@discount.name}", "/merchant/#{@merchant.id}/discounts/#{@discount.id}/edit", method: :get %>
