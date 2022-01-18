@@ -5,6 +5,8 @@ class Admin::InvoicesController < ApplicationController
   end
 
   def show
+    @customer = @invoice.customer
+    @invoice_item = InvoiceItem.where(invoice_id: params[:id]).first
   end
 
   def edit
