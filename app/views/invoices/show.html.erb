@@ -43,7 +43,7 @@
         <section id="the-status-<%= i.id %>">
           <tr class="tr">
                                           <% if @invoice.discount_items.include?(i) %>
-            <td style="text-align:center"><%= link_to "View Discount: #{i.item.name}", merchant_discount_path(@merchant, i.discounts.ids.find() ) %></td>
+            <td style="text-align:center"><%= link_to "View Discount: #{i.item.name}", merchant_discount_path(@merchant, i.discounts.ids.first ) %></td>
                                           <% else %>
             <td style="text-align:center"><%= i.item.name %>
                                           <% end %>
