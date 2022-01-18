@@ -99,5 +99,153 @@ RSpec.describe 'invoices show' do
        expect(page).to_not have_content("in progress")
      end
   end
+  describe 'merchant invoice discounts' do
+    it "I see total discounted revenue from this invoice which include bulk discounts" do
+      merchant = Merchant.create!(name: 'Hair Care')
+
+      item1 = Item.create!(name: "Shampoo", description: "This washes your hair", unit_price: 10, merchant_id: merchant.id)
+      item2 = Item.create!(name: "Conditioner", description: "This makes your hair shiny", unit_price: 8, merchant_id: merchant.id)
+      item3 = Item.create!(name: "Brush", description: "This takes out tangles", unit_price: 5, merchant_id: merchant.id)
+
+      customer1 = Customer.create!(first_name: 'Joey', last_name: 'Smith')
+
+      invoice1 = Invoice.create!(customer_id: customer1.id, status: 2, created_at: "2012-03-27 14:54:09")
+
+      ii1 = InvoiceItem.create!(invoice_id: invoice1.id, item_id: item1.id, quantity: 15, unit_price: 10, status: 2)
+      ii3 = InvoiceItem.create!(invoice_id: invoice1.id, item_id: item2.id, quantity: 2, unit_price: 10, status: 2)
+      ii4 = InvoiceItem.create!(invoice_id: invoice1.id, item_id: item3.id, quantity: 3, unit_price: 5, status: 2)
+
+      transaction1 = Transaction.create!(credit_card_number: 203942, result: 1, invoice_id: invoice1.id)
+
+      discount1 = merchant.discounts.create!(name: 'discount1', percent_discount: 20, quantity_limit: 10)
+      discount2 = merchant.discounts.create!(name: 'discount2', percent_discount: 30, quantity_limit: 15)
+      visit merchant_invoice_path(merchant, invoice1)
+      expect(page).to have_content("Discounted Price: $45.00")
+      expect(page).to have_content("New Price: $140.00")
+    end
+
+    it "does not apply a discount" do
+      merchant = Merchant.create!(name: 'Hair Care')
+
+      item1 = Item.create!(name: "Shampoo", description: "This washes your hair", unit_price: 10, merchant_id: merchant.id)
+      item2 = Item.create!(name: "Conditioner", description: "This makes your hair shiny", unit_price: 8, merchant_id: merchant.id)
+      item3 = Item.create!(name: "Brush", description: "This takes out tangles", unit_price: 5, merchant_id: merchant.id)
+
+      customer1 = Customer.create!(first_name: 'Joey', last_name: 'Smith')
+
+      invoice1 = Invoice.create!(customer_id: customer1.id, status: 2, created_at: "2012-03-27 14:54:09")
+
+      ii1 = InvoiceItem.create!(invoice_id: invoice1.id, item_id: item1.id, quantity: 8, unit_price: 10, status: 2)
+      ii3 = InvoiceItem.create!(invoice_id: invoice1.id, item_id: item2.id, quantity: 2, unit_price: 10, status: 2)
+      ii4 = InvoiceItem.create!(invoice_id: invoice1.id, item_id: item3.id, quantity: 3, unit_price: 5, status: 2)
+
+      transaction1 = Transaction.create!(credit_card_number: 203942, result: 1, invoice_id: invoice1.id)
+
+      discount1 = merchant.discounts.create!(name: 'discount1', percent_discount: 20, quantity_limit: 10)
+      discount2 = merchant.discounts.create!(name: 'discount2', percent_discount: 30, quantity_limit: 15)
+      visit merchant_invoice_path(merchant, invoice1)
+      expect(page).to have_content("Discounted Price: $0.00")
+      expect(page).to have_content("New Price: $115.00")
+    end
+    it "applies both discounts" do
+      merchant = Merchant.create!(name: 'Hair Care')
+
+      item1 = Item.create!(name: "Shampoo", description: "This washes your hair", unit_price: 10, merchant_id: merchant.id)
+      item2 = Item.create!(name: "Conditioner", description: "This makes your hair shiny", unit_price: 8, merchant_id: merchant.id)
+      item3 = Item.create!(name: "Brush", description: "This takes out tangles", unit_price: 5, merchant_id: merchant.id)
+
+      customer1 = Customer.create!(first_name: 'Joey', last_name: 'Smith')
+
+      invoice1 = Invoice.create!(customer_id: customer1.id, status: 2, created_at: "2012-03-27 14:54:09")
+
+      ii1 = InvoiceItem.create!(invoice_id: invoice1.id, item_id: item1.id, quantity: 8, unit_price: 10, status: 2)
+      ii3 = InvoiceItem.create!(invoice_id: invoice1.id, item_id: item2.id, quantity: 2, unit_price: 10, status: 2)
+      ii4 = InvoiceItem.create!(invoice_id: invoice1.id, item_id: item3.id, quantity: 1, unit_price: 5, status: 2)
+
+      transaction1 = Transaction.create!(credit_card_number: 203942, result: 1, invoice_id: invoice1.id)
+
+      discount1 = merchant.discounts.create!(name: 'discount1', percent_discount: 20, quantity_limit: 2)
+      discount2 = merchant.discounts.create!(name: 'discount2', percent_discount: 25, quantity_limit: 4)
+      visit merchant_invoice_path(merchant, invoice1)
+      expect(page).to have_content("Discounted Price: $24.00")
+      expect(page).to have_content("New Price: $81.00")
+    end
+    it "text" do
+      merchant = Merchant.create!(name: 'Hair Care')
+
+      item1 = Item.create!(name: "Shampoo", description: "This washes your hair", unit_price: 10, merchant_id: merchant.id)
+      item2 = Item.create!(name: "Conditioner", description: "This makes your hair shiny", unit_price: 8, merchant_id: merchant.id)
+      item3 = Item.create!(name: "Brush", description: "This takes out tangles", unit_price: 5, merchant_id: merchant.id)
+
+      customer1 = Customer.create!(first_name: 'Joey', last_name: 'Smith')
+
+      invoice1 = Invoice.create!(customer_id: customer1.id, status: 2, created_at: "2012-03-27 14:54:09")
+
+      ii1 = InvoiceItem.create!(invoice_id: invoice1.id, item_id: item1.id, quantity: 8, unit_price: 10, status: 2)
+      ii3 = InvoiceItem.create!(invoice_id: invoice1.id, item_id: item2.id, quantity: 2, unit_price: 10, status: 2)
+      ii4 = InvoiceItem.create!(invoice_id: invoice1.id, item_id: item3.id, quantity: 1, unit_price: 5, status: 2)
+
+      transaction1 = Transaction.create!(credit_card_number: 203942, result: 1, invoice_id: invoice1.id)
+
+      discount1 = merchant.discounts.create!(name: 'discount1', percent_discount: 25, quantity_limit: 2)
+      discount2 = merchant.discounts.create!(name: 'discount2', percent_discount: 10, quantity_limit: 4)
+      visit merchant_invoice_path(merchant, invoice1)
+      expect(page).to have_content("Discounted Price: $25.00")
+      expect(page).to have_content("New Price: $80.00")
+    end
+    it "applies discount only to specific merchants items" do
+      merchant = Merchant.create!(name: 'Hair Care')
+      merchant2 = Merchant.create!(name: 'wade')
+
+      item1 = Item.create!(name: "Shampoo", description: "This washes your hair", unit_price: 10, merchant_id: merchant.id)
+      item2 = Item.create!(name: "Conditioner", description: "This makes your hair shiny", unit_price: 8, merchant_id: merchant.id)
+      item3 = Item.create!(name: "Brush", description: "This takes out tangles", unit_price: 5, merchant_id: merchant.id)
+      item4 = Item.create!(name: "spoon", description: "This takes out soup", unit_price: 5, merchant_id: merchant2.id)
+
+      customer1 = Customer.create!(first_name: 'Joey', last_name: 'Smith')
+
+      invoice1 = Invoice.create!(customer_id: customer1.id, status: 2, created_at: "2012-03-27 14:54:09")
+
+      ii1 = InvoiceItem.create!(invoice_id: invoice1.id, item_id: item1.id, quantity: 8, unit_price: 10, status: 2)
+      ii3 = InvoiceItem.create!(invoice_id: invoice1.id, item_id: item2.id, quantity: 2, unit_price: 10, status: 2)
+      ii4 = InvoiceItem.create!(invoice_id: invoice1.id, item_id: item3.id, quantity: 1, unit_price: 5, status: 2)
+      ii4 = InvoiceItem.create!(invoice_id: invoice1.id, item_id: item4.id, quantity: 10, unit_price: 5, status: 2)
+
+      transaction1 = Transaction.create!(credit_card_number: 203942, result: 1, invoice_id: invoice1.id)
+
+      discount1 = merchant.discounts.create!(name: 'discount1', percent_discount: 25, quantity_limit: 2)
+      discount2 = merchant.discounts.create!(name: 'discount2', percent_discount: 10, quantity_limit: 4)
+      visit merchant_invoice_path(merchant, invoice1)
+      expect(page).to have_content("Discounted Price: $25.00")
+      expect(page).to have_content("New Price: $130.00")
+    end
+  end
+  it "links to discount show page" do
+    merchant = Merchant.create!(name: 'Hair Care')
+
+    item1 = Item.create!(name: "Shampoo", description: "This washes your hair", unit_price: 10, merchant_id: merchant.id)
+    item2 = Item.create!(name: "Conditioner", description: "This makes your hair shiny", unit_price: 8, merchant_id: merchant.id)
+    item3 = Item.create!(name: "Brush", description: "This takes out tangles", unit_price: 5, merchant_id: merchant.id)
+
+    customer1 = Customer.create!(first_name: 'Joey', last_name: 'Smith')
+
+    invoice1 = Invoice.create!(customer_id: customer1.id, status: 2, created_at: "2012-03-27 14:54:09")
+
+    ii1 = InvoiceItem.create!(invoice_id: invoice1.id, item_id: item1.id, quantity: 8, unit_price: 10, status: 2)
+    ii3 = InvoiceItem.create!(invoice_id: invoice1.id, item_id: item2.id, quantity: 2, unit_price: 10, status: 2)
+    ii4 = InvoiceItem.create!(invoice_id: invoice1.id, item_id: item3.id, quantity: 1, unit_price: 5, status: 2)
+
+    transaction1 = Transaction.create!(credit_card_number: 203942, result: 1, invoice_id: invoice1.id)
+
+    discount1 = merchant.discounts.create!(name: 'discount1', percent_discount: 25, quantity_limit: 2)
+    discount2 = merchant.discounts.create!(name: 'discount2', percent_discount: 10, quantity_limit: 4)
+
+    visit merchant_invoice_path(merchant, invoice1)
+    expect(page).to have_link("View Discount: #{item1.name}")
+    expect(page).to have_content("Brush")
+    click_link("View Discount: #{item1.name}")
+    expect(current_path).to eq(merchant_discount_path(merchant,discount1))
+    
+  end
 
 end
