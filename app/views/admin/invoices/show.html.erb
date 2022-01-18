@@ -23,7 +23,8 @@
       <% end %>
   <p>Created on: <%= @invoice.created_at.strftime("%A, %B %d, %Y") %>
   <p>Total Revenue: $<%= @invoice.total_revenue %>
-
+    <p> Discounted Price: <%=number_to_currency(@invoice.discount_revenue) %></p>
+    <p> New Price: <%=number_to_currency(@invoice.total_revenue - @invoice.discount_revenue)  %> </p>
   <h4>Customer:</h4>
     <%= @invoice.customer.first_name %> <%= @invoice.customer.last_name %><br>
     <%= @invoice.customer.address %><br>
