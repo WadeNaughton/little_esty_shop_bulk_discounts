@@ -238,14 +238,14 @@ RSpec.describe 'invoices show' do
     transaction1 = Transaction.create!(credit_card_number: 203942, result: 1, invoice_id: invoice1.id)
 
     discount1 = merchant.discounts.create!(name: 'discount1', percent_discount: 10, quantity_limit: 6)
-    discount2 = merchant.discounts.create!(name: 'discount2', percent_discount: 25, quantity_limit: 4)
+    discount2 = merchant.discounts.create!(name: 'discount2', percent_discount: 5, quantity_limit: 2)
 
     visit merchant_invoice_path(merchant, invoice1)
-    expect(page).to have_link("Discount Name: #{discount2.name}")
-    expect(page).to have_content("Brush")
-    click_link("Discount Name: #{discount2.name}")
-    expect(current_path).to eq(merchant_discount_path(merchant,discount2))
-
+    within("#the-status-#{ii1.id}") do
+      expect(page).to have_link("Discount Name: #{discount1.name}")
+      click_link("Discount Name: #{discount1.name}")
+      expect(current_path).to eq(merchant_discount_path(merchant,discount1))
+    end
   end
 
 end
