@@ -241,10 +241,10 @@ RSpec.describe 'invoices show' do
     discount2 = merchant.discounts.create!(name: 'discount2', percent_discount: 25, quantity_limit: 4)
 
     visit merchant_invoice_path(merchant, invoice1)
-    expect(page).to have_link("View Discount: $#{item1.unit_price}")
+    expect(page).to have_link("Discount Name: #{discount2.name}")
     expect(page).to have_content("Brush")
-    click_link("View Discount: $#{item1.unit_price}")
-    expect(current_path).to eq(merchant_discount_path(merchant,discount1))
+    click_link("Discount Name: #{discount2.name}")
+    expect(current_path).to eq(merchant_discount_path(merchant,discount2))
 
   end
 

@@ -3,11 +3,14 @@ class Item < ApplicationRecord
                         :description,
                         :unit_price,
                         :merchant_id
-
+                        
+  belongs_to :merchant
   has_many :invoice_items
   has_many :invoices, through: :invoice_items
+  has_many :customers, through: :invoices
+  has_many :transactions, through: :invoices
   has_many :discounts, through: :merchant
-  belongs_to :merchant
+
 
   enum status: [:disabled, :enabled]
 
@@ -20,4 +23,10 @@ class Item < ApplicationRecord
     .order("money desc", "created_at desc")
     .first&.created_at&.to_date
   end
+
+  def discounts_applied(quantity)
+    discounts.where('? >= discounts.quantity_limit', quantity)
+                  .order(percent_discount: :desc).first
+  end
+
 end
